@@ -1,0 +1,9 @@
+<resources>
+	<string name="app_name">MoeTune</string>
+
+	<string name="title_section1">聆听</string>
+	<string name="title_section2">设置</string>
+	<string name="title_section3">关于</string>
+	<string name="title_section4">退出</string>
+
+</resources>
