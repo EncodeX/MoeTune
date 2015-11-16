@@ -17,6 +17,7 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.uexperience.moetune.R;
+import com.uexperience.moetune.view.SlidableLayout;
 
 import java.lang.ref.WeakReference;
 
@@ -33,6 +34,10 @@ import butterknife.ButterKnife;
 public class NowPlayingFragment extends BaseFragment {
 	@Bind(R.id.album_image)
 	ImageView mAlbumImage;
+	@Bind(R.id.slide_up_button)
+	ImageButton mSlideUpButton;
+	@Bind(R.id.now_playing_card)
+	SlidableLayout mNowPlayingCard;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,12 @@ public class NowPlayingFragment extends BaseFragment {
 		ButterKnife.bind(this, rootView);
 		Picasso.with(getContext()).load(R.drawable.ic_app_album).into(mAlbumImage);
 
+		mSlideUpButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				mNowPlayingCard.toggleView(SlidableLayout.SlideDirection.UP);
+			}
+		});
 
 		return rootView;
 	}

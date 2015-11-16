@@ -15,14 +15,12 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.view.ViewHelper;
-import com.uexperience.moetune.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +80,7 @@ public class SlidableLayout extends RelativeLayout{
 	private Context mContext;
 	private State mState;
 	private SlideDirection mSlideDirection;
+	private SlideDirection mIntentDirection;
 	private List<View> mIgnoredViews;
 
 	private AnimatorSet mSlideAnimation;
@@ -129,7 +128,7 @@ public class SlidableLayout extends RelativeLayout{
 		LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 		View bottomView = new View(context);
 		bottomView.setClickable(true);
-		addView(bottomView,0,layoutParams);
+		addView(bottomView, 0, layoutParams);
 
 		onCreateView(context);
 
@@ -150,6 +149,8 @@ public class SlidableLayout extends RelativeLayout{
 		mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
 		mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
 
+		mIntentDirection = null;
+
 		mIgnoredViews = new ArrayList<>();
 
 		mViewToggleListener = new Animator.AnimatorListener() {
@@ -162,15 +163,28 @@ public class SlidableLayout extends RelativeLayout{
 
 			@Override
 			public void onAnimationEnd(Animator animation) {
-				if(mIsViewSlidedOut){
+				toggleHardwareAcceleration(false);
+				if(mState!= State.SLIDING){
+					Log.d("DragHelper", "onAnimationEnd mState: "+ mState);
+					return;
+				}
+
+				final float currentY = Math.round(ViewHelper.getY(SlidableLayout.this));
+
+				if(currentY == getBottomBorder()){
+					mIsViewSlidedOut = false;
+					mLastPositionY = getBottomBorder();
+					Log.d("DragHelper", "onAnimationEnd mIsViewSlidedOut: " + mIsViewSlidedOut + " mLastPositionY: "+ mLastPositionY);
+				}else if(currentY == getTopBorder()){
+					mIsViewSlidedOut = true;
 					mLastPositionY = getTopBorder();
 					Log.d("DragHelper", "onAnimationEnd mIsViewSlidedOut: " + mIsViewSlidedOut + " mLastPositionY: "+ mLastPositionY);
 				}else{
-					mLastPositionY = getBottomBorder();
+					mIsViewSlidedOut = false;
+					mLastPositionY = currentY;
 					Log.d("DragHelper", "onAnimationEnd mIsViewSlidedOut: " + mIsViewSlidedOut + " mLastPositionY: "+ mLastPositionY);
 				}
 //				mLastPositionX = SlidableLayout.this.getLeft();
-				toggleHardwareAcceleration(false);
 				mState = State.IDLE;
 			}
 
@@ -214,7 +228,7 @@ public class SlidableLayout extends RelativeLayout{
 		createVelocityTracker(ev);
 
 
-//		Log.d("DragHelper", "action: "+ action);
+		Log.d("DragHelper", "mState: " + mState);
 
 		switch (action) {
 			case MotionEvent.ACTION_DOWN:
@@ -264,15 +278,18 @@ public class SlidableLayout extends RelativeLayout{
 				mLastMotionY = y;
 
 				float intentY = mLastPositionY + yOffset;
+				Log.d("DragHelper", "top: "+getTopBorder() + " bottom: "+getBottomBorder() + " intentY: "+ intentY);
 				if(intentY < getTopBorder()){
 					intentY = getTopBorder();
 					mInitialMotionY = y;
+					mLastPositionY = getTopBorder();
 				}else if(intentY > getBottomBorder()){
 					intentY = getBottomBorder();
 					mInitialMotionY = y;
+					mLastPositionY = getBottomBorder();
 				}
 
-				Log.d("DragHelper", "top: "+getTopBorder() + " bottom: "+getBottomBorder() + " intentY: "+ intentY);
+				Log.d("DragHelper", "fixedIntentY: "+ intentY);
 
 				ViewHelper.setY(this, intentY);
 
@@ -285,18 +302,33 @@ public class SlidableLayout extends RelativeLayout{
 			case MotionEvent.ACTION_UP:
 				Log.d("DragHelper", "dispatchTouchEvent ACTION_UP");
 
-				if(mState != State.TOUCH_DOWN
-						&& mState != State.TOUCH_MOVE
-						&& mState != State.TOUCH_MOVE_HORIZONTAL
-						&& mState != State.TOUCH_MOVE_VERTICAL) break;
-
 				switch (mState){
 					case TOUCH_DOWN:
+					case IDLE:
 					case TOUCH_MOVE:
-						toggleView(SlideDirection.LOCKED);
 						mActivePointerId = POINTER_INVALID;
-
-						if(mIsViewSlidedOut) return true;
+						if(mIsViewSlidedOut && mLastPositionY == getTopBorder()) {
+							toggleView(SlideDirection.LOCKED);
+							ev.setAction(MotionEvent.ACTION_CANCEL);
+						}
+						else if(mLastPositionY != getBottomBorder()){
+//							if(Math.abs(mLastPositionY)>dip2px(mContext, 56)){
+//								ev.setAction(MotionEvent.ACTION_CANCEL);
+//								toggleView(SlideDirection.LOCKED);
+//							}else{
+//								ViewHelper.setY(this,getBottomBorder());
+//							}
+							toggleView(mIntentDirection);
+							ev.setAction(MotionEvent.ACTION_CANCEL);
+						}else{
+							mState = State.IDLE;
+						}
+//						break;
+//						Log.d("DragHelper", "dispatchTouchEvent ACTION_UP TOUCH_MOVE");
+//						toggleView(SlideDirection.LOCKED);
+//						mActivePointerId = POINTER_INVALID;
+//
+//						if(mIsViewSlidedOut) return true;
 
 						break;
 					case TOUCH_MOVE_HORIZONTAL:
@@ -327,13 +359,10 @@ public class SlidableLayout extends RelativeLayout{
 				Log.d("DragHelper", "dispatchTouchEvent ACTION_CANCEL");
 				if(mIsViewSlidedOut){
 					toggleView(SlideDirection.UP);
-					mState = State.IDLE;
-					mActivePointerId = POINTER_INVALID;
 				}else{
 					toggleView(SlideDirection.LOCKED);
-					mState = State.IDLE;
-					mActivePointerId = POINTER_INVALID;
 				}
+				mActivePointerId = POINTER_INVALID;
 				break;
 		}
 		return super.dispatchTouchEvent(ev);
@@ -427,19 +456,29 @@ public class SlidableLayout extends RelativeLayout{
 		return 0;
 	}
 
-	private void toggleView(SlideDirection direction){
+	public void toggleView(SlideDirection direction){
+		Log.d("DragHelper", "Toggle View");
+		mIntentDirection = direction;
+
+		int duration;
+		final float totalDistance = Math.abs(getTopBorder() - getBottomBorder());
+		final float ratio = Math.abs(ViewHelper.getY(this) - getBottomBorder())/totalDistance;
+//		ratio = ratio > 1/2 ? ratio - 1/2 : ratio + 1/2 ;
+		final float fixedRatio = 1 - (float)Math.sin((1-ratio)*Math.PI/2);
+
+		Log.d("SlidableLayout","ratio: "+ratio+" fixedRatio: "+fixedRatio);
 
 		// TODO 分情况讨论
 		switch (direction){
 			case LOCKED:
-				buildSlideAnimation(this, 0);
+				duration = Math.round(fixedRatio * 600);
+				buildSlideAnimation(this, 0, duration);
 				mSlideAnimation.start();
-				mIsViewSlidedOut = false;
 				break;
 			case UP:
-				buildSlideAnimation(this, -mViewHeight + dip2px(mContext, 56));
+				duration = Math.round((1-fixedRatio) * 600);
+				buildSlideAnimation(this, -mViewHeight + dip2px(mContext, 56), duration);
 				mSlideAnimation.start();
-				mIsViewSlidedOut = true;
 				break;
 		}
 	}
@@ -453,16 +492,24 @@ public class SlidableLayout extends RelativeLayout{
 				targetPosition = SlideDirection.LOCKED;
 			} else if (velocity < 0){
 				targetPosition = SlideDirection.UP;
+			} else {
+				if(totalDelta > 0){
+					targetPosition = SlideDirection.LOCKED;
+				}else {
+					targetPosition = SlideDirection.UP;
+				}
 			}
 		} else {
+			final float totalDistance = Math.abs(getTopBorder() - getBottomBorder());
+			final float ratio = Math.abs(ViewHelper.getY(this) - getBottomBorder())/totalDistance;
 			if(mIsViewSlidedOut){
-				if(totalDelta < -mViewHeight * 0.5){
+				if(ratio > 0.8){
 					targetPosition = SlideDirection.UP;
 				}else{
 					targetPosition = SlideDirection.LOCKED;
 				}
 			}else{
-				if(totalDelta > -mViewHeight * 0.3){
+				if(ratio < 0.2){
 					targetPosition = SlideDirection.LOCKED;
 				}else{
 					targetPosition = SlideDirection.UP;
@@ -519,14 +566,14 @@ public class SlidableLayout extends RelativeLayout{
 		}
 	}
 
-	private void buildSlideAnimation(View target, float targetPosY){
+	private void buildSlideAnimation(View target, float targetPosY, int duration){
 		mSlideAnimation = new AnimatorSet();
 		mSlideAnimation.playTogether(
 				ObjectAnimator.ofFloat(target, "translationY", targetPosY)
 		);
 		mSlideAnimation.setInterpolator(new DecelerateInterpolator(4.0f));
 
-		mSlideAnimation.setDuration(700);
+		mSlideAnimation.setDuration(duration);
 		mSlideAnimation.addListener(mViewToggleListener);
 	}
 

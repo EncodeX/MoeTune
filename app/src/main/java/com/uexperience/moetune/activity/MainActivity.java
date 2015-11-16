@@ -1,21 +1,29 @@
 package com.uexperience.moetune.activity;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.pnikosis.materialishprogress.ProgressWheel;
 import com.uexperience.moetune.R;
+import com.uexperience.moetune.event.MusicControlEvent;
 import com.uexperience.moetune.fragment.FragmentException;
 import com.uexperience.moetune.fragment.MainFragmentManager;
 import com.uexperience.moetune.fragment.NavigationDrawerFragment;
+import com.uexperience.moetune.service.MusicService;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import de.greenrobot.event.EventBus;
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks{
 	@Bind(R.id.drawer_toggle_button)
@@ -25,7 +33,13 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 	@Bind(R.id.loading_indicator_icon)
 	ImageView mLoadingIndicatorIcon;
 
+
+	private EventBus eventBus = EventBus.getDefault();
+
 	private NavigationDrawerFragment mNavigationDrawerFragment;
+
+	private boolean mIsMusicServiceBound = false;
+	private MusicService mMusicService;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +48,20 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 		ButterKnife.bind(this);
 
 		initView();
+	}
+
+	@Override
+	protected void onStart() {
+		Log.d("MusicService","onStart, isMusicServiceStarted: " + MusicService.mIsServiceRunning + " isMusicServiceBound: " + mIsMusicServiceBound);
+		super.onStart();
+		if(!MusicService.mIsServiceRunning){
+			final Intent intent = new Intent(this,MusicService.class);
+			startService(intent);
+		}
+		if(!mIsMusicServiceBound){
+			final Intent intent = new Intent(this,MusicService.class);
+			bindService(intent,mMusicServiceConnection, BIND_AUTO_CREATE);
+		}
 	}
 
 	@Override
@@ -48,7 +76,20 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 
 	@Override
 	protected void onStop() {
+		Log.d("MusicService","onStop, isMusicServiceStarted: " + MusicService.mIsServiceRunning + " isMusicServiceBound: " + mIsMusicServiceBound);
 		super.onStop();
+		if(mIsMusicServiceBound){
+			unbindService(mMusicServiceConnection);
+			mIsMusicServiceBound = false;
+
+			// Todo 暂时在退出Activity的同时停止service
+			final Intent intent = new Intent(this,MusicService.class);
+			stopService(intent);
+		}
+//		if(MusicService.mIsServiceRunning){
+//			final Intent intent = new Intent(this,MusicService.class);
+//			stopService(intent);
+//		}
 	}
 
 	@Override
@@ -145,4 +186,18 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 			}
 		});
 	}
+
+	private ServiceConnection mMusicServiceConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+			MusicService.MessageBinder binder = (MusicService.MessageBinder)iBinder;
+			mMusicService = binder.getService();
+			mIsMusicServiceBound = true;
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName componentName) {
+			mIsMusicServiceBound = false;
+		}
+	};
 }

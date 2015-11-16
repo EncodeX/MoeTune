@@ -11,4 +11,12 @@
 		<item name="android:fitsSystemWindows">true</item>
 	</style>
 
+	<style name="AppTheme.NotificationText" parent="android:TextAppearance.Material.Notification"/>
+
+	<style name="AppTheme.NotificationTitle" parent="android:TextAppearance.Material.Notification.Title"/>
+
+	<style name="AppTheme.NotificationTitleBold" parent="android:TextAppearance.Material.Notification.Title">
+		<item name="android:textStyle">bold</item>
+	</style>
+
 </resources>

@@ -11,6 +11,7 @@
 		android:background="@android:color/background_light"
 		android:elevation="4dp"/>
 	<com.uexperience.moetune.view.SlidableLayout
+		android:id="@+id/now_playing_card"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
 		android:background="@android:color/background_light"
@@ -131,6 +132,7 @@
 			android:clickable="false"
 			style="@style/AppTheme.UnboundedButton.White.Borderless">
 			<ImageButton
+				android:id="@+id/slide_up_button"
 				android:layout_width="56dp"
 				android:layout_height="56dp"
 				android:padding="10dp"
