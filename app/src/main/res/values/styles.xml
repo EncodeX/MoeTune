@@ -26,6 +26,14 @@
 		<item name="android:minWidth">0dip</item>
 		<item name="android:minHeight">0dip</item>
 	</style>
+	<style name="AppTheme.UnboundedButton.Transparent.Borderless" parent="Widget.AppCompat.Button.Borderless">
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:background">@android:color/transparent</item>
+		<item name="android:gravity">center</item>
+		<item name="android:minWidth">0dip</item>
+		<item name="android:minHeight">0dip</item>
+	</style>
 
 	<style name="AppTheme.Button" parent="Widget.AppCompat.Button">
 		<item name="android:background">@drawable/btn_primary</item>
@@ -38,13 +46,9 @@
 		<item name="android:textColor">@android:color/white</item>
 	</style>
 
-	<style name="AppTheme.NotificationText">
-		<item name="android:textColor">?android:attr/textColorSecondary</item>
-	</style>
+	<style name="AppTheme.NotificationText" parent="Base.TextAppearance.AppCompat.Display3"/>
 
-	<style name="AppTheme.NotificationTitle">
-		<item name="android:textColor">?android:attr/textColorPrimary</item>
-	</style>
+	<style name="AppTheme.NotificationTitle" parent="Base.TextAppearance.AppCompat.Title"/>
 
 	<style name="AppTheme.NotificationTitleBold">
 		<item name="android:textColor">?android:attr/textColorPrimary</item>

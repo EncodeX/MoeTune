@@ -17,12 +17,14 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.uexperience.moetune.R;
+import com.uexperience.moetune.event.MusicControlEvent;
 import com.uexperience.moetune.view.SlidableLayout;
 
 import java.lang.ref.WeakReference;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import de.greenrobot.event.EventBus;
 
 /**
  * Created with Android Studio.
@@ -38,6 +40,10 @@ public class NowPlayingFragment extends BaseFragment {
 	ImageButton mSlideUpButton;
 	@Bind(R.id.now_playing_card)
 	SlidableLayout mNowPlayingCard;
+	@Bind(R.id.play_button)
+	ImageButton mPlayButton;
+
+	private EventBus eventBus = EventBus.getDefault();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -58,6 +64,13 @@ public class NowPlayingFragment extends BaseFragment {
 			}
 		});
 
+
+		mPlayButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				eventBus.post(new MusicControlEvent(MusicControlEvent.ACTION_STOP));
+			}
+		});
 		return rootView;
 	}
 

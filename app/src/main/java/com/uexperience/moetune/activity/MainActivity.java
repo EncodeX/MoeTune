@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 	@Bind(R.id.loading_indicator_icon)
 	ImageView mLoadingIndicatorIcon;
 
-
 	private EventBus eventBus = EventBus.getDefault();
 
 	private NavigationDrawerFragment mNavigationDrawerFragment;
@@ -94,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 
 	@Override
 	protected void onDestroy() {
+		Log.d("MainActivity","On Destroy");
 		super.onDestroy();
 		MainFragmentManager.onDestroy();
 	}

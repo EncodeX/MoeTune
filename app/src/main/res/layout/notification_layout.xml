@@ -2,7 +2,8 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="64dp">
+                android:layout_height="match_parent"
+                xmlns:tools="http://schemas.android.com/tools">
     <ImageView
             android:layout_width="64dp"
             android:layout_height="64dp"
@@ -41,18 +42,19 @@
         </RelativeLayout>
     </RelativeLayout>
 	<RelativeLayout
-		android:layout_width="64dp"
+		android:layout_width="128dp"
 		android:layout_height="64dp"
+        android:layout_marginRight="-32dp"
 		android:clickable="false"
-		style="@style/AppTheme.UnboundedButton.Borderless"
-		android:layout_centerVertical="true"
+        style="@style/AppTheme.UnboundedButton.Transparent.Borderless"
 		android:layout_alignParentRight="true">
 		<ImageButton
 			android:id="@+id/notification_next_button"
-			android:layout_width="32dp"
-			android:layout_height="32dp"
+			android:layout_width="64dp"
+			android:layout_height="64dp"
+            android:padding="16dp"
 			android:src="@drawable/ic_next"
 			android:scaleType="centerCrop"
-			style="@style/AppTheme.UnboundedButton.Borderless"/>
+            style="@style/AppTheme.UnboundedButton.Borderless"/>
 	</RelativeLayout>
 </RelativeLayout>

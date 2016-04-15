@@ -67,5 +67,6 @@ public class MainFragmentManager {
 	public static void onDestroy(){
 		fragmentMap.clear();
 		currentFragmentIndex = -1;
+		System.gc();
 	}
 }

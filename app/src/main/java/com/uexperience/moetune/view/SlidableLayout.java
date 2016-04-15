@@ -488,9 +488,9 @@ public class SlidableLayout extends RelativeLayout{
 		// TODO 分情况讨论
 
 		if (Math.abs(totalDelta) > mFlingDistance && Math.abs(velocity) > mMinimumVelocity) {
-			if (velocity > 0) {
+			if (velocity > 0 && totalDelta > 0) {
 				targetPosition = SlideDirection.LOCKED;
-			} else if (velocity < 0){
+			} else if (velocity < 0 && totalDelta < 0){
 				targetPosition = SlideDirection.UP;
 			} else {
 				if(totalDelta > 0){

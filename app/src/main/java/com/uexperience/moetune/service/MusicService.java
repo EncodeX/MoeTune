@@ -7,7 +7,9 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.uexperience.moetune.core.MoeTuneNotificationManager;
+import com.uexperience.moetune.core.MNotificationManager;
+import com.uexperience.moetune.core.MusicListManager;
+import com.uexperience.moetune.core.TestPlayer;
 import com.uexperience.moetune.event.MusicControlEvent;
 
 import java.util.HashMap;
@@ -25,41 +27,11 @@ import de.greenrobot.event.EventBus;
 public class MusicService extends Service {
 	public static boolean mIsServiceRunning = false;
 
-	/*Service状态*/
-	public enum PlayerState{
-		IDLE,
-		INITIALIZED,
-		PREPARING,
-		PREPARED,
-		PLAYING,
-		STOPPED,
-		PAUSED,
-		COMPLETED,
-		ERROR;
-
-		@Override
-		public String toString() {
-			return readableMap.get(this);
-		}
-
-		private static Map<PlayerState, String> readableMap;
-
-		static {
-			readableMap = new HashMap<PlayerState, String>(9);
-			readableMap.put(IDLE, "IDLE");
-			readableMap.put(INITIALIZED, "INITIALIZED");
-			readableMap.put(PREPARING, "PREPARING");
-			readableMap.put(PREPARED, "PREPARED");
-			readableMap.put(PLAYING, "PLAYING");
-			readableMap.put(STOPPED, "STOPPED");
-			readableMap.put(PAUSED, "PAUSED");
-			readableMap.put(COMPLETED, "COMPLETED");
-			readableMap.put(ERROR, "ERROR");
-		}
-	}
-
 	private EventBus eventBus = EventBus.getDefault();
-	private MoeTuneNotificationManager mNotificationManager;
+	private MNotificationManager mNotificationManager;
+	private MusicListManager mMusicListManager;
+
+	private TestPlayer testPlayer;
 
 	public MusicService() {}
 
@@ -97,7 +69,10 @@ public class MusicService extends Service {
 	public void onCreate() {
 		Log.d("MusicService","on Create");
 		eventBus.register(this);
-		mNotificationManager = new MoeTuneNotificationManager(this);
+		mNotificationManager = new MNotificationManager(this);
+		mMusicListManager = new MusicListManager(this);
+
+		testPlayer = new TestPlayer(this);
 		super.onCreate();
 	}
 
@@ -105,7 +80,11 @@ public class MusicService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.d("MusicService","on StartCommand");
 		mIsServiceRunning = true;
-		return super.onStartCommand(intent, flags, startId);
+
+//		mMusicListManager.refreshMusicList();
+
+		testPlayer.prepareAsync();
+		return START_STICKY;
 	}
 
 	@Override
@@ -114,10 +93,15 @@ public class MusicService extends Service {
 		eventBus.unregister(this);
 		mNotificationManager.onDestroy();
 		mIsServiceRunning = false;
+
+		testPlayer.release();
 		super.onDestroy();
 	}
 
 	public void onEvent(MusicControlEvent event){
 		Log.d("EventBus","on event");
+		if(event.getAction() == MusicControlEvent.ACTION_STOP){
+			testPlayer.stop();
+		}
 	}
 }

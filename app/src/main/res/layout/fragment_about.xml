@@ -104,15 +104,4 @@
             android:elevation="2dp"
             android:text="觉得不错？给我评分"/>
     </RelativeLayout>
-	<TextView
-		android:text="部分图标来自 icons8.com"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_centerHorizontal="true"
-		android:layout_alignParentBottom="true"
-		android:layout_marginBottom="12dp"
-		android:textColor="@android:color/white"
-		android:textSize="12sp"
-		android:textIsSelectable="false"
-		android:autoLink="all"/>
 </RelativeLayout>

@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
  * Project: MoeTune
  * Package: com.uexperience.moetune.core
  */
-public class MoeTuneNotificationManager {
+public class MNotificationManager {
 	private static final Class<?>[] mSetForegroundSignature = new Class[] {
 			boolean.class};
 	private static final Class<?>[] mStartForegroundSignature = new Class[] {
@@ -43,16 +43,15 @@ public class MoeTuneNotificationManager {
 	private Service mService;
 	private Context mContext;
 
-	public MoeTuneNotificationManager(Service service) {
+	public MNotificationManager(Service service) {
 		this.mService = service;
-		this.mContext = service.getApplicationContext();
+		this.mContext = service.getBaseContext();
 
 		initNotificationManager();
 	}
 
 	public void onDestroy(){
-		// Todo 修改1517为final域
-		stopForegroundCompat(1517);
+		stopForegroundCompat(Constants.Config.NOTIFICATION_ID);
 	}
 
 	private void invokeMethod(Method method, Object[] args) {
@@ -60,10 +59,10 @@ public class MoeTuneNotificationManager {
 			method.invoke(mService, args);
 		} catch (InvocationTargetException e) {
 			// Should not happen.
-//			Log.w("ApiDemos", "Unable to invoke method", e);
+			Log.w("ApiDemos", "Unable to invoke method", e);
 		} catch (IllegalAccessException e) {
 			// Should not happen.
-//			Log.w("ApiDemos", "Unable to invoke method", e);
+			Log.w("ApiDemos", "Unable to invoke method", e);
 		}
 	}
 
@@ -147,21 +146,21 @@ public class MoeTuneNotificationManager {
 
 		builder.setContent(remoteViews);
 		builder.setContentIntent(contentIntent);
-		// todo 记得换掉这个 下面这个图标是旧版本的
-		builder.setSmallIcon(R.drawable.ic_small);
+		builder.setSmallIcon(R.drawable.ic_app_small);
 		builder.setContentTitle("Foreground Service");
 		builder.setContentText("Make this service run in the foreground.");
 		builder.setOngoing(true);
 		builder.setPriority(NotificationCompat.PRIORITY_MAX);
+
 		Notification notification = builder.build();
+
 		if(Build.VERSION.SDK_INT >= 16){
 			RemoteViews remoteBigViews = new RemoteViews("com.uexperience.moetune",R.layout.notification_big_layout);
 			notification.bigContentView = remoteBigViews;
 //			currentRemoteBigViews = remoteBigViews;
 		}
 
-		// Todo 修改1517为final域
-		startForegroundCompat(1517, notification);
+		startForegroundCompat(Constants.Config.NOTIFICATION_ID, notification);
 //		onNotificationChangedListener.notificationChanged(notification);
 //		currentRemoteViews = remoteViews;
 //		startForegroundCompat(MoeTuneConstants.Config.NOTIFICATION_ID, notification);
