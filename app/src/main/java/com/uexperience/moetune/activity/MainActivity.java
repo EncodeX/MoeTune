@@ -103,6 +103,9 @@ public class MainActivity extends AppCompatActivity implements NavigationDrawerF
 		if(position == MainFragmentManager.getCurrentFragmentIndex()) return;
 
 		if(position == 3){
+			// Todo 暂时在退出Activity的同时停止service
+			onStop();
+
 			MainActivity.this.finish();
 			System.exit(0);
 			return;
