@@ -19,29 +19,45 @@ public class MainFragmentManager {
 	private static int currentFragmentIndex = -1;
 
 	public static BaseFragment changeToFragment(int index) throws FragmentException {
-		if(!fragmentMap.containsKey(index)){
-			BaseFragment newFragment = null;
+//		if(!fragmentMap.containsKey(index)){
+//			BaseFragment newFragment = null;
+//
+//			switch (index){
+//				case 0:
+//					newFragment = new NowPlayingFragment();
+//					break;
+//				case 1:
+//					newFragment = new SettingFragment();
+//					break;
+//				case 2:
+//					newFragment = new AboutFragment();
+//					break;
+//			}
+//			if(newFragment == null){
+//				throw new FragmentException("Fragment Manager didn't create new fragment instance.");
+//			}
+//			fragmentMap.put(index,newFragment);
+//		}
+//
+//		currentFragmentIndex = index;
+//
+//		return fragmentMap.get(index);
 
-			switch (index){
-				case 0:
-					newFragment = new NowPlayingFragment();
-					break;
-				case 1:
-					newFragment = new SettingFragment();
-					break;
-				case 2:
-					newFragment = new AboutFragment();
-					break;
-			}
-			if(newFragment == null){
-				throw new FragmentException("Fragment Manager didn't create new fragment instance.");
-			}
-			fragmentMap.put(index,newFragment);
+		BaseFragment newFragment = null;
+
+		switch (index){
+			case 0:
+				newFragment = new NowPlayingFragment();
+				break;
+			case 1:
+				newFragment = new SettingFragment();
+				break;
+			case 2:
+				newFragment = new AboutFragment();
+				break;
 		}
 
-		currentFragmentIndex = index;
-
-		return fragmentMap.get(index);
+		return newFragment;
 	}
 
 	public static boolean isFragmentInitialized(int index){

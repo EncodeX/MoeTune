@@ -2,6 +2,7 @@ package com.uexperience.moetune.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -15,7 +16,7 @@ import android.widget.ListView;
 import com.uexperience.moetune.R;
 import com.uexperience.moetune.adapter.DrawerMenuAdapter;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -31,7 +32,7 @@ public class NavigationDrawerFragment extends Fragment {
 	 */
 	private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
 
-	@Bind(R.id.drawer_menu_list) ListView mDrawerMenuList;
+	@BindView(R.id.drawer_menu_list) ListView mDrawerMenuList;
 
 	private DrawerLayout mDrawerLayout;
 	private View mFragmentContainerView;
@@ -48,7 +49,7 @@ public class NavigationDrawerFragment extends Fragment {
 
 	@Nullable
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_navigation_drawer,container,false);
 		ButterKnife.bind(this, rootView);
 

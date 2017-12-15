@@ -9,13 +9,13 @@ import android.util.Log;
 
 import com.uexperience.moetune.core.MNotificationManager;
 import com.uexperience.moetune.core.MusicListManager;
-import com.uexperience.moetune.core.TestPlayer;
+import com.uexperience.moetune.core.MusicPlayer;
 import com.uexperience.moetune.event.MusicControlEvent;
+import com.uexperience.moetune.event.MusicListManagerEvent;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import de.greenrobot.event.EventBus;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * Created with Android Studio.
@@ -31,7 +31,7 @@ public class MusicService extends Service {
 	private MNotificationManager mNotificationManager;
 	private MusicListManager mMusicListManager;
 
-	private TestPlayer testPlayer;
+	private MusicPlayer mMusicPlayer;
 
 	public MusicService() {}
 
@@ -47,19 +47,19 @@ public class MusicService extends Service {
 	@Nullable
 	@Override
 	public IBinder onBind(Intent intent) {
-		Log.d("MusicService","on Bind");
+//		Log.d("MusicService","on Bind");
 		return new MessageBinder();
 	}
 
 	@Override
 	public boolean onUnbind(Intent intent) {
-		Log.d("MusicService","on Unbind");
+//		Log.d("MusicService","on Unbind");
 		return super.onUnbind(intent);
 	}
 
 	@Override
 	public void onRebind(Intent intent) {
-		Log.d("MusicService","on Rebind");
+//		Log.d("MusicService","on Rebind");
 		super.onRebind(intent);
 	}
 
@@ -67,41 +67,51 @@ public class MusicService extends Service {
 
 	@Override
 	public void onCreate() {
-		Log.d("MusicService","on Create");
+//		Log.d("MusicService","on Create");
 		eventBus.register(this);
 		mNotificationManager = new MNotificationManager(this);
 		mMusicListManager = new MusicListManager(this);
 
-		testPlayer = new TestPlayer(this);
+		mMusicPlayer = new MusicPlayer(this);
 		super.onCreate();
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		Log.d("MusicService","on StartCommand");
+//		Log.d("MusicService","on StartCommand");
 		mIsServiceRunning = true;
 
-//		mMusicListManager.refreshMusicList();
+		mMusicListManager.refreshMusicList();
 
-		testPlayer.prepareAsync();
 		return START_STICKY;
 	}
 
 	@Override
 	public void onDestroy() {
-		Log.d("MusicService", "on Destroy");
+//		Log.d("MusicService", "on Destroy");
 		eventBus.unregister(this);
 		mNotificationManager.onDestroy();
 		mIsServiceRunning = false;
 
-		testPlayer.release();
+		mMusicPlayer.release();
 		super.onDestroy();
 	}
 
+	@Subscribe(threadMode = ThreadMode.MAIN)
 	public void onEvent(MusicControlEvent event){
-		Log.d("EventBus","on event");
+//		Log.d("EventBus","on music control event");
 		if(event.getAction() == MusicControlEvent.ACTION_STOP){
-			testPlayer.stop();
+			mMusicPlayer.stop();
+		}
+	}
+
+	@Subscribe(threadMode = ThreadMode.MAIN)
+	public void onEvent(MusicListManagerEvent event){
+//		Log.d("EventBus","on music prepared event");
+		switch (event.getResultCode()){
+			case MusicListManagerEvent.LIST_PREPARED:
+				mMusicPlayer.streamUrl(mMusicListManager.getNextMusicUrl());
+				break;
 		}
 	}
 }

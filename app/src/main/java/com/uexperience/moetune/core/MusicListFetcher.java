@@ -1,7 +1,6 @@
 package com.uexperience.moetune.core;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -10,9 +9,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.uexperience.moetune.event.MusicListFetcherEvent;
 
+import org.greenrobot.eventbus.EventBus;
 import org.json.JSONObject;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * Created with Android Studio.
@@ -40,7 +38,6 @@ public class MusicListFetcher {
 	private Response.Listener<JSONObject> mRequestListener = new Response.Listener<JSONObject>() {
 		@Override
 		public void onResponse(JSONObject response) {
-//			Log.d("MusicListFetcher",response.toString());
 			mEventBus.post(new MusicListFetcherEvent(MusicListFetcherEvent.RESULT_SUCCESS, response));
 		}
 	};
@@ -48,7 +45,6 @@ public class MusicListFetcher {
 	private Response.ErrorListener mErrorListener = new Response.ErrorListener() {
 		@Override
 		public void onErrorResponse(VolleyError error) {
-//			Log.e("MusicListFetcher", error.getMessage(), error);
 			mEventBus.post(new MusicListFetcherEvent(MusicListFetcherEvent.RESULT_FAILED, error));
 		}
 	};

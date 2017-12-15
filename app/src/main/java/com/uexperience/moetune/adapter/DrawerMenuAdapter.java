@@ -17,7 +17,7 @@ import com.uexperience.moetune.model.DrawerMenuItem;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
@@ -124,9 +124,9 @@ public class DrawerMenuAdapter extends BaseAdapter {
 	}
 
 	public static class ViewHolderItem{
-		@Bind(R.id.drawer_item_image)ImageView icon;
-		@Bind(R.id.drawer_item_title)TextView title;
-		@Bind(R.id.drawer_item_layout)RelativeLayout itemLayout;
+		@BindView(R.id.drawer_item_image) ImageView icon;
+		@BindView(R.id.drawer_item_title)TextView title;
+		@BindView(R.id.drawer_item_layout)RelativeLayout itemLayout;
 
 		public ViewHolderItem(View itemView) {
 			ButterKnife.bind(this,itemView);

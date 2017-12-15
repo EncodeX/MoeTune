@@ -15,22 +15,22 @@ import android.widget.ImageView;
 
 import com.pnikosis.materialishprogress.ProgressWheel;
 import com.uexperience.moetune.R;
-import com.uexperience.moetune.event.MusicControlEvent;
 import com.uexperience.moetune.fragment.FragmentException;
 import com.uexperience.moetune.fragment.MainFragmentManager;
 import com.uexperience.moetune.fragment.NavigationDrawerFragment;
 import com.uexperience.moetune.service.MusicService;
 
-import butterknife.Bind;
+import org.greenrobot.eventbus.EventBus;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import de.greenrobot.event.EventBus;
 
 public class MainActivity extends AppCompatActivity implements NavigationDrawerFragment.NavigationDrawerCallbacks{
-	@Bind(R.id.drawer_toggle_button)
+	@BindView(R.id.drawer_toggle_button)
 	ImageButton mDrawerToggleButton;
-	@Bind(R.id.loading_indicator)
+	@BindView(R.id.loading_indicator)
 	ProgressWheel mLoadingIndicator;
-	@Bind(R.id.loading_indicator_icon)
+	@BindView(R.id.loading_indicator_icon)
 	ImageView mLoadingIndicatorIcon;
 
 	private EventBus eventBus = EventBus.getDefault();

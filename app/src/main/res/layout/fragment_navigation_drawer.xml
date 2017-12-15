@@ -66,5 +66,5 @@
         android:listSelector="@android:color/transparent"
         android:background="#FFFFFF"
         android:layout_below="@+id/menu_space"
-        tools:context="encodex.moetune.app.fragments.NavigationDrawerFragment"/>
+        tools:context="com.uexperience.moetune.fragment.NavigationDrawerFragment"/>
 </RelativeLayout>

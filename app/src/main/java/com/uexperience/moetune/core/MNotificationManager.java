@@ -7,7 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -155,8 +155,7 @@ public class MNotificationManager {
 		Notification notification = builder.build();
 
 		if(Build.VERSION.SDK_INT >= 16){
-			RemoteViews remoteBigViews = new RemoteViews("com.uexperience.moetune",R.layout.notification_big_layout);
-			notification.bigContentView = remoteBigViews;
+			notification.bigContentView = new RemoteViews("com.uexperience.moetune",R.layout.notification_big_layout);
 //			currentRemoteBigViews = remoteBigViews;
 		}
 

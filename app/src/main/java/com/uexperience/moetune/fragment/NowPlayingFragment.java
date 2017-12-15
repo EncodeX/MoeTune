@@ -1,14 +1,7 @@
 package com.uexperience.moetune.fragment;
 
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,13 +11,13 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import com.uexperience.moetune.R;
 import com.uexperience.moetune.event.MusicControlEvent;
+import com.uexperience.moetune.service.MusicService;
 import com.uexperience.moetune.view.SlidableLayout;
 
-import java.lang.ref.WeakReference;
+import org.greenrobot.eventbus.EventBus;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import de.greenrobot.event.EventBus;
 
 /**
  * Created with Android Studio.
@@ -34,16 +27,16 @@ import de.greenrobot.event.EventBus;
  * Package: com.uexperience.moetune.fragment
  */
 public class NowPlayingFragment extends BaseFragment {
-	@Bind(R.id.album_image)
+	@BindView(R.id.album_image)
 	ImageView mAlbumImage;
-	@Bind(R.id.slide_up_button)
+	@BindView(R.id.slide_up_button)
 	ImageButton mSlideUpButton;
-	@Bind(R.id.now_playing_card)
+	@BindView(R.id.now_playing_card)
 	SlidableLayout mNowPlayingCard;
-	@Bind(R.id.play_button)
+	@BindView(R.id.play_button)
 	ImageButton mPlayButton;
 
-	private EventBus eventBus = EventBus.getDefault();
+	private EventBus mEventBus = EventBus.getDefault();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +48,7 @@ public class NowPlayingFragment extends BaseFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.fragment_now_playing, container, false);
 		ButterKnife.bind(this, rootView);
+
 		Picasso.with(getContext()).load(R.drawable.ic_app_album).into(mAlbumImage);
 
 		mSlideUpButton.setOnClickListener(new View.OnClickListener() {
@@ -64,11 +58,10 @@ public class NowPlayingFragment extends BaseFragment {
 			}
 		});
 
-
 		mPlayButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				eventBus.post(new MusicControlEvent(MusicControlEvent.ACTION_STOP));
+				mEventBus.post(new MusicControlEvent(MusicControlEvent.ACTION_STOP));
 			}
 		});
 		return rootView;
